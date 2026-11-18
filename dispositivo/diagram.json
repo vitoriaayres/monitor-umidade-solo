@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "author": "PICSimLab Import - ESP32",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": -4.76, "attrs": {} },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 25.6,
+      "left": -340,
+      "attrs": { "pins": "i2c", "address": "0x27" }
+    },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 315.5, "left": -182.6, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -61,
+      "left": -115.2,
+      "attrs": { "color": "red", "label": "EMERGENCIA" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -128.4,
+      "left": 291.8,
+      "attrs": { "color": "red", "label": "Terra Seca" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": -128.4,
+      "left": 368.6,
+      "attrs": { "color": "limegreen", "label": "Terra Úmida" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led3",
+      "top": -118.8,
+      "left": 445.4,
+      "attrs": { "color": "cyan", "label": "Bomba de Água" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "txt_seco",
+      "top": -172.8,
+      "left": 278.4,
+      "attrs": { "text": "TERRA \nSECA" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "txt_umida",
+      "top": -172.8,
+      "left": 364.8,
+      "attrs": { "text": "TERRA \nÚMIDA" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "txt_bomba",
+      "top": -163.2,
+      "left": 441.6,
+      "attrs": { "text": "BOMBA DE \nÁGUA" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "txt_emerg",
+      "top": -115.2,
+      "left": -115.2,
+      "attrs": { "text": "BOTÃO DE \n EMERGÊNCIA" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "txt_sensor",
+      "top": 288,
+      "left": -211.2,
+      "attrs": { "text": "SENSOR UMIDADE" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -62.4,
+      "left": 258.65,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -62.4,
+      "left": 335.45,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": -52.8,
+      "left": 402.65,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    }
+  ],
+  "connections": [
+    [ "lcd1:GND", "esp:GND.1", "black", [ "h-20", "v130", "h330" ] ],
+    [ "lcd1:VCC", "esp:5V", "red", [ "h-30", "v130", "h340" ] ],
+    [ "lcd1:SDA", "esp:21", "blue", [ "h-40", "v160", "h520", "v-140" ] ],
+    [ "lcd1:SCL", "esp:22", "purple", [ "h-50", "v170", "h540", "v-175" ] ],
+    [ "pot1:GND", "esp:GND.1", "black", [ "v20", "h150", "v-195" ] ],
+    [ "pot1:VCC", "esp:3V3", "red", [ "v10", "h140", "v-345" ] ],
+    [ "pot1:SIG", "esp:34", "green", [ "v30", "h120", "v-315" ] ],
+    [ "btn1:1.l", "esp:4", "orange", [ "h-20", "v57.6", "h320", "v134.4" ] ],
+    [ "btn1:2.l", "esp:GND.2", "black", [ "h-30", "v-115", "h245.96" ] ],
+    [ "led1:A", "esp:18", "green", [ "h19.2", "v60", "h-150", "v120" ] ],
+    [ "led1:C", "r1:1", "black", [ "v0" ] ],
+    [ "r1:2", "esp:GND.2", "black", [ "v10", "h-120" ] ],
+    [ "led2:A", "esp:19", "gold", [ "h19.2", "v70", "h-230", "v100" ] ],
+    [ "led2:C", "r2:1", "black", [ "v0" ] ],
+    [ "r2:2", "esp:GND.2", "black", [ "v10", "h-200" ] ],
+    [ "led3:A", "esp:23", "red", [ "h28.8", "v80", "h-310", "v40" ] ],
+    [ "led3:C", "r3:1", "black", [ "v0" ] ],
+    [ "r3:2", "esp:GND.2", "black", [ "v10", "h-280" ] ]
+  ],
+  "dependencies": {}
+}
