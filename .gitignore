@@ -4,3 +4,4 @@ config.py
 supabase/.temp/
 node_modules/
 __pycache__/
+painel/config.js
