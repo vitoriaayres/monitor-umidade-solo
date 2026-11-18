@@ -39,17 +39,67 @@ Regras do dispositivo:
 ## Estrutura
 
 ```
-dispositivo/   código MicroPython do ESP32 e diagrama do Wokwi
+dispositivo/                 código MicroPython do ESP32 e diagrama do Wokwi
+supabase/functions/ingest/   API que recebe as leituras (Edge Function, Deno)
+banco/schema.sql             tabela readings, índice e permissões
+painel/                      página que mostra o histórico
 ```
+
+## API
+
+`POST /functions/v1/ingest` com o header `x-ingest-key`. A função confere a chave e valida o JSON (os mesmos limites da tabela). Depois grava a leitura usando a chave secreta do Supabase. Quem define a hora de recebimento é o banco (`received_at`), não o dispositivo.
+
+| Resposta | Quando |
+|---|---|
+| 201 | leitura nova gravada |
+| 200 | `message_id` repetido, ignorado |
+| 400 | JSON inválido ou fora do contrato |
+| 401 | chave errada ou ausente |
+| 413 | corpo maior que 4 KB |
+
+## Banco
+
+Tabela `public.readings`, com chave primária `(device_id, message_id)`, para a mesma mensagem não entrar duas vezes. O RLS está ligado e só permite leitura pública (`select`). Por isso o painel consegue consultar com a chave publishable, mas não consegue inserir nada.
 
 ## Como reproduzir
 
-### Dispositivo (Wokwi)
+### 1. Banco
+
+No Supabase, abra o SQL Editor e rode `banco/schema.sql`.
+
+### 2. API
+
+Com a [CLI do Supabase](https://supabase.com/docs/guides/cli):
+
+```
+supabase login
+supabase link --project-ref SEU-PROJETO
+supabase secrets set INGEST_KEY=uma-chave-com-pelo-menos-32-caracteres
+supabase functions deploy ingest --no-verify-jwt
+```
+
+O `--no-verify-jwt` é necessário porque o ESP32 se autentica pelo `x-ingest-key`, não por login.
+
+Teste rápido:
+
+```
+curl -X POST https://SEU-PROJETO.supabase.co/functions/v1/ingest \
+  -H "Content-Type: application/json" -H "x-ingest-key: SUA-CHAVE" \
+  -d '{"topic":"turma/teste_01/telemetria","reading":{"device_id":"teste_01","message_id":"teste-1","humidity":50,"emergency_activated":false,"soil_condition":"humida"}}'
+```
+
+### 3. Dispositivo (Wokwi)
 
 1. Crie um projeto ESP32 MicroPython no Wokwi.
 2. Copie `dispositivo/main.py` e `dispositivo/diagram.json`.
 3. Crie um `config.py` a partir de `dispositivo/config.exemplo.py`, com a URL da sua Edge Function e a chave de ingestão.
-4. Rode a simulação e mexa no potenciômetro do sensor de umidade. O monitor serial mostra `ENVIADO SUPABASE [HTTP 200]` a cada envio.
+4. Rode a simulação e mexa no potenciômetro do sensor de umidade. O monitor serial mostra `ENVIADO SUPABASE [HTTP 201]` a cada envio.
+
+### 4. Painel
+
+1. Copie `painel/config.exemplo.js` para `painel/config.js` e coloque a URL do projeto e a chave **publishable** (Project Settings > API Keys). Nunca a secret.
+2. Para testar localmente: `python -m http.server` dentro de `painel/` e abra http://localhost:8000.
+3. Para publicar, suba a pasta `painel/` no Cloudflare Pages (Workers & Pages > Create > Pages > Upload assets).
 
 ## Limitações
 
